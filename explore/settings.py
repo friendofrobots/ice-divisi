@@ -22,7 +22,7 @@ INTERNAL_IPS = [
 ]
 
 ADMINS = [
-    # ("Your Name", "your_email@domain.com"),
+    ("Greg Vargas", "gvargas@mit.edu"),
 ]
 
 MANAGERS = ADMINS
