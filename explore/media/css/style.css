@@ -1,0 +1,18 @@
+body {
+  margin:0;
+  padding:0;
+}
+
+#header {
+  width:100%;
+  border-bottom: 1px solid black;
+}
+
+#header a {
+  text-decoration: none;
+  color: black;
+}
+
+ul {
+ list-style-type: none;
+}

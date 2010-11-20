@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block head_title %}categories{% endblock %}
+
+{% block content %}
+  <form action="/category/" method="post">>
+    <div class="options">
+      <h2>Profiles</h2>
+      <ul>
+        {% for profile in profiles %}
+        <li>
+          <div class="profile">
+            <input type="checkbox" name="object" value="{{ profile.id }}" />
+            <img src="https://graph.facebook.com/{{ profile.id }}/picture"/>
+            <a href="/p/{{ profile.id }}/">{{ profile.name }}</a>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="options">
+      <h2>Pages</h2>
+      <ul>
+        {% for page in pages %}
+        <li>
+          <div class="page">
+            <input type="checkbox" name="object" value="{{ page.id }}" />
+            <img src="https://graph.facebook.com/{{ page.id }}/picture"/>
+            <a href="/p/{{ page.id }}/">{{ page.name }}</a>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    <input type="submit" value="Submit" />
+  </form>
+{% endblock %}

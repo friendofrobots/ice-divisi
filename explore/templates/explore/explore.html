@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block head_title %}explore{% endblock %}
+
+{% block content %}
+  <div class="options">
+    <a href="/categories/">categories</a>
+  </div>
+  <div class="options">
+    <h2>Profiles</h2>
+    <ul>
+      {% for profile in profiles %}
+      <li>
+        <div class="profile">
+          <img src="https://graph.facebook.com/{{ profile.id }}/picture"/>
+          <a href="/p/{{ profile.id }}/">{{ profile.name }}</a>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div class="options">
+    <ul>
+      {% for page in pages %}
+      <li>
+        <div class="page">
+          <img src="https://graph.facebook.com/{{ page.id }}/picture"/>
+          <a href="/p/{{ page.id }}/">{{ page.name }}</a>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endblock %}

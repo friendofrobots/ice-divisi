@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block head_title }}category{% endblock %}
+
+{% block content %}
+  <h2>Category</h2>
+  <ul>
+    {% for object in objects %}
+    <li>
+      <div class="object">
+        <h2>{{ object.name }}</h2>
+        <img src="https://graph.facebook.com/{{ object.id }}/picture"/>
+        {% if object.gender %}
+        gender : {{ object.gender.name }}
+        {% endif %}
+        {% if object.hometown %}
+        hometown : {{ object.hometown.name }}
+        {% endif %}
+        {% if object.category %}
+        category : {{ object.category }}
+        {% endif %}
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+  <div>
+    <a href="/compare/{{ object.id }}/">Compare to...</a>
+  </div>
+  {% if object.likes %}
+  <div>
+    <h3>likes</h3>
+    <ul>
+      {% for like in likes %}
+      <li>
+        <a href="/p/{{ like.id }}/">{{ like.name }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+  <div id="features" class="top_items">
+    <h3>Top Features</h3>
+    <ul>
+      {% for feature in topFea %}
+      <li>
+        {{ feature }}
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div id="similarities" class="top_items">
+    <h3>Top Similarities</h3>
+    <ul>
+      {% for concept,weight in topSim %}
+      <li>
+        <a href="/p/{{ concept.id }}/">{{ concept.name }}</a>
+        | {{ weight }}
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div id="predictions" class="top_items">
+    <h3>Top Predictions</h3>
+    <ul>
+      {% for concept,weight in topPre %}
+      <li>
+        <a href="/p/{{ concept.id }}/">{{ concept.name }}</a>
+        | {{ weight }}
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endblock %}

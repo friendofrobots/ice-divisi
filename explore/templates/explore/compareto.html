@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block head_title %}Compare {{ object.name }} to ...{% endblock %}
+
+{% block content %}
+  <div id="object">
+    <h2>Compare {{ object.name }}</h2>
+    <img src="https://graph.facebook.com/{{ object.id }}/picture"/>
+    {% if object.gender %}
+    gender : {{ object.gender.name }}
+    {% endif %}
+    {% if object.hometown %}
+    hometown : {{ object.hometown.name }}
+    {% endif %}
+    {% if object.category %}
+    category : {{ object.category }}
+    {% endif %}
+  </div>
+  {% if object.likes %}
+  <div>
+    <h2>to ...</h2>
+    <h3>profiles</h3>
+    <ul>
+      {% for profile in profiles %}
+      <li>
+        <div class="profile">
+          <img src="https://graph.facebook.com/{{ profile.id }}/picture"/>
+          <a href="/compare/{{ object.id }}/{{ profile.id }}/">{{ profile.name }}</a>
+          | <a href="/project/{{ object.id }}/{{ profile.id }}/">project</a>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div class="options">
+    <h3>pages</h3>
+    <ul>
+      {% for page in pages %}
+      <li>
+        <div class="page">
+          <img src="https://graph.facebook.com/{{ page.id }}/picture"/>
+          <a href="/compare/{{ object.id }}/{{ page.id }}/">{{ page.name }}</a>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endblock %}
