@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block head_title }}category{% endblock %}
+{% block head_title %}category{% endblock %}
 
 {% block content %}
   <h2>Category</h2>
@@ -23,27 +23,14 @@
     </li>
     {% endfor %}
   </ul>
-  <div>
-    <a href="/compare/{{ object.id }}/">Compare to...</a>
-  </div>
-  {% if object.likes %}
-  <div>
-    <h3>likes</h3>
-    <ul>
-      {% for like in likes %}
-      <li>
-        <a href="/p/{{ like.id }}/">{{ like.name }}</a>
-        </li>
-      {% endfor %}
-    </ul>
-  </div>
-  {% endif %}
   <div id="features" class="top_items">
     <h3>Top Features</h3>
     <ul>
-      {% for feature in topFea %}
+      {% for verb,concept,weight in topFea %}
       <li>
-        {{ feature }}
+        {{ verb }}
+        <a href="/p/{{ concept.id }}">{{ concept.name }}</a>
+        | {{ weight }}
       </li>
       {% endfor %}
     </ul>
@@ -53,7 +40,7 @@
     <ul>
       {% for concept,weight in topSim %}
       <li>
-        <a href="/p/{{ concept.id }}/">{{ concept.name }}</a>
+        <a href="/p/{{ concept.id }}">{{ concept.name }}</a>
         | {{ weight }}
       </li>
       {% endfor %}
@@ -62,9 +49,10 @@
   <div id="predictions" class="top_items">
     <h3>Top Predictions</h3>
     <ul>
-      {% for concept,weight in topPre %}
+      {% for verb,concept,weight in topPre %}
       <li>
-        <a href="/p/{{ concept.id }}/">{{ concept.name }}</a>
+        {{ verb }}
+        <a href="/p/{{ concept.id }}">{{ concept.name }}</a>
         | {{ weight }}
       </li>
       {% endfor %}

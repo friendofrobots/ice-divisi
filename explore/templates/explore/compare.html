@@ -3,33 +3,51 @@
 {% block head_title %}Compare {{ object1.name }} to {{ object2.name }}{% endblock %}
 
 {% block content %}
-  <div id="compare">
+  <div id="sidebar">
+    <div id="profile-pic">
+      <img src="https://graph.facebook.com/{{ object1.id }}/picture?type=large"/>
+    </div>
+    <ul id="properties">
+      {% if object1.gender %}
+      <li>
+        gender : {{ object1.gender.name }}
+      </li>
+      {% endif %}
+      {% if object1.hometown %}
+      <li>
+        hometown : {{ object1.hometown.name }}
+      </li>
+      {% endif %}
+      {% if object1.category %}
+      <li>
+        category : {{ object1.category }}
+      </li>
+      {% endif %}
+    </ul>
+  </div>
+  <div id="comparison">
     <h2>{{ object1.name }} and {{ object2.name }} are {{ weight }} similar.</h2>
   </div>
-  <div>
-    <h3><a href="/p/{{ object1.id }}/">{{ object1.name }}</a></h3>
-    <img src="https://graph.facebook.com/{{ object1.id }}/picture"/>
-    {% if object1.gender %}
-    gender : {{ object1.gender.name }}
-    {% endif %}
-    {% if object1.hometown %}
-    hometown : {{ object1.hometown.name }}
-    {% endif %}
-    {% if object1.category %}
-    category : {{ object1.category }}
-    {% endif %}
-  </div>
-  <div>
-    <h3><a href="/p/{{ object2.id }}/">{{ object2.name }}</a></h3>
-    <img src="https://graph.facebook.com/{{ object2.id }}/picture"/>
-    {% if object2.gender %}
-    gender : {{ object2.gender.name }}
-    {% endif %}
-    {% if object2.hometown %}
-    hometown : {{ object2.hometown.name }}
-    {% endif %}
-    {% if object2.category %}
-    category : {{ object2.category }}
-    {% endif %}
+  <div id="right-sidebar">
+    <div id="profile-pic">
+      <img src="https://graph.facebook.com/{{ object2.id }}/picture?type=large"/>
+    </div>
+    <ul id="properties">
+      {% if object2.gender %}
+      <li>
+        gender : {{ object2.gender.name }}
+      </li>
+      {% endif %}
+      {% if object2.hometown %}
+      <li>
+        hometown : {{ object2.hometown.name }}
+      </li>
+      {% endif %}
+      {% if object2.category %}
+      <li>
+        category : {{ object2.category }}
+      </li>
+      {% endif %}
+    </ul>
   </div>
 {% endblock %}

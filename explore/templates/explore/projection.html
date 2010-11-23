@@ -3,36 +3,60 @@
 {% block head_title %}{{ profile1.name }} projected onto {{ profile2.name }}{% endblock %}
 
 {% block content %}
-  <div id="profile">
-    <h2>{{ profile1.name }} projected onto {{ profile2.name }}</h2>
-  </div>
-  <div>
-    <h3>likes</h3>
+  <div id="sidebar">
+    <div id="profile-pic">
+      <img src="https://graph.facebook.com/{{ profile1.id }}/picture?type=large"/>
+    </div>
+    <ul id="properties">
+      {% if profile1.gender %}
+      <li>
+        gender : {{ profile1.gender.name }}
+      </li>
+      {% endif %}
+      {% if profile1.hometown %}
+      <li>
+        hometown : {{ profile1.hometown.name }}
+      </li>
+      {% endif %}
+      {% if profile1.category %}
+      <li>
+        category : {{ profile1.category }}
+      </li>
+      {% endif %}
+      </ul>
+    </div>
+  <div id="results">
+    <h1>{{ profile1.name }} projected onto {{ profile2.name }}</h1>
+    <h2>likes</h2>
     <ul>
       {% for like in projected_likes %}
       <li>
-        <a href="/p/{{ like.id }}/">{{ like.name }}</a>
+        <a href="/p/{{ like.id }}">{{ like.name }}</a>
       </li>
       {% endfor %}
     </ul>
   </div>
-  <div>
+  <div id="for-comparison">
     <h2>for comparison</h2>
-    <h3>{{ profile1.name }}'s likes</h3>
-    <ul>
-      {% for like in profile1.likes %}
-      <li>
-        <a href="/p/{{ like.id }}/">{{ like.name }}</a>
-      </li>
-      {% endfor %}
-    </ul>
-    <h3>{{ profile2.name }}'s likes</h3>
-    <ul>
-      {% for like in profile2.likes %}
-      <li>
-        <a href="/p/{{ like.id }}/">{{ like.name }}</a>
-      </li>
-      {% endfor %}
-    </ul>
+    <div class="profile-likes">
+      <h3>{{ profile1.name }}'s likes</h3>
+      <ul>
+        {% for like in profile1.likes %}
+        <li>
+          <a href="/p/{{ like.id }}">{{ like.name }}</a>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="profile-likes">
+      <h3>{{ profile2.name }}'s likes</h3>
+      <ul>
+        {% for like in profile2.likes %}
+        <li>
+          <a href="/p/{{ like.id }}">{{ like.name }}</a>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
   </div>
 {% endblock %}

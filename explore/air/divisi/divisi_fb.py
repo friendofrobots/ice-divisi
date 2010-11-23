@@ -45,6 +45,7 @@ class FBGraph():
         self.profiles = []
         self.pages = []
 
+        self.name = "fbgraph"
         self.filename = None
         self.ready = False
 
@@ -57,10 +58,10 @@ class FBGraph():
     def exported(self):
         return self.filename
 
-    def getProfiles():
+    def getProfiles(self):
         return self.profiles
 
-    def getPages():
+    def getPages(self):
         return self.pages
 
     def getById(id):
@@ -140,7 +141,8 @@ class FBGraph():
             self.pages.append(page)
         return page
 
-    def export(self,filename='fb.graph'):
+    def export(self):
+        filename = self.name+'.graph'
         f = open(filename,'w')
         f.close()
         with open(filename,'a') as gf:
@@ -148,8 +150,6 @@ class FBGraph():
                 self.add_profile_to_graph(profile,gf)
             for page in self.pages:
                 self.add_page_to_graph(page,gf)
-        self.filename = filename
-        self.save()
         return filename
 
     def append_to_file(self,subject,object,rel,file):
@@ -167,14 +167,18 @@ class FBGraph():
     def add_page_to_graph(self,page,file):
         self.append_to_file(page.id,page.category,"isA",file)
 
-    def save(self,filename="FBGraph.pickle"):
-        with open(filename,'wb') as fbgf:
+    def save(self):
+        self.filename = self.name+'.pickle'
+        with open(self.filename,'wb') as fbgf:
             pickle.dump(self,fbgf)
 
     # Edit graph capabilities
     def copy(self):
         fbgraph = FBGraph()
-        # TODO: fill this out
+        fbgraph.profiles = list(self.profiles)
+        fbgraph.pages = list(self.pages)
+        fbgraph.idtable = dict(self.idtable)
+
         return fbgraph
         
     def removeLikeFromProfile(self,profileId,pageId):
@@ -183,15 +187,32 @@ class FBGraph():
         if page in profile.likes:
             profile.likes.remove(page)
 
-    def addProfile(self,profile):
-        self.idtable[profileId] = profile
+    def createProfile(self,data,likeids):
+        profile = Profile(data)
+        profile.gender = self.idtable[data['gender']]
+        profile.hometown = self.idtable[data['hometown']]
+        profile.likes = [self.idtable[likeid] for likeid in likeids]
+        while True:
+            c = 0
+            if 'new'+c not in self.idtable:
+                profile.id = 'new'+c
+                self.idtable[profile.id] = profile
+                break
+            c += 1
         self.profiles.append(profile)
+        self.filename = None
+        return profile
+
+    def setName(self,name):
+        self.name = name
 
 
 class DivisiFB:
-    def __init__(self, filename=None):
+    def __init__(self, filename=None, fbgraph=None):
         # Initialize FBGraph either empty or from file
-        if filename:
+        if fbgraph:
+            self.fbgraph=fbgraph
+        elif filename:
             self.fbgraph = self.loadGraph(filename)
         else:
             self.fbgraph = FBGraph()
@@ -247,18 +268,19 @@ class DivisiFB:
             if not self.fbgraph.readyToExport():
                 self.downloadGraph()
             graphFilename = self.fbgraph.export()
+            self.fbgraph.save('filename')
         matrix = divisi2.load(graphFilename)
         smatrix = divisi2.network.sparse_matrix(matrix, 'nodes', 'features', cutoff=1)
         return smatrix
 
     def getSVD(self,k=25,normalized=False):
         if normalized:
-            return self.getSMatrix().normalize_all().svd(k=25)
+            return self.getSMatrix().normalize_all().svd(k=k)
         else:
             return self.getSMatrix().svd(k=k)
 
     # Note: checks post first, then pre, never does both.
-    def getSimilarity(self, post_normalize=True, pre_normalize=False):
+    def getSimilarity(self, post_normalize=False, pre_normalize=False):
         if post_normalize:
             if 'sim_post' in self.cache:
                 return self.cache['sim_post']
@@ -290,36 +312,37 @@ class DivisiFB:
         return predictions
 
     # Use Matrix - similarity and predictions
-    def topSimilarity(self,id,n=10):
-        sim = self.getSimilarity(post_normalize=False,pre_normalize=True)
-        return sim.row_named(id).top_items(n)
+    def topSimilarity(self,id,n=20):
+        sim = self.getSimilarity(pre_normalize=True)
+        return [(self.getById(x[0]),x[1]) for x in sim.row_named(id).top_items(n)]
 
-    def topPredictions(self,id,n=10):
+    def topPredictions(self,id,n=20):
         predictions = self.getPredictions()
-        return predictions.row_named(id).top_items(n)
+        # for category, expecting id, getting category string. need to make categories pages?
+        return [(x[0][1],self.getById(x[0][2]),x[1]) for x in predictions.row_named(id).top_items(n)]
     
     def compare(self,id1,id2):
-        sim = self.getSimilarity(post_normalize=False,pre_normalize=True)
+        sim = self.getSimilarity(pre_normalize=True)
         return sim.entry_named(id1,id2)
 
     # Use Matrix - categories
     def createCategory(self,ids):
-        return divisi2.category(dict([(id,1) for id in ids]))
+        return divisi2.SparseVector.from_dict(dict([(id,1) for id in ids]))
 
-    def categoryTopFeatures(self,category,n=10):
+    def categoryTopFeatures(self,category,n=20):
         category_features = divisi2.aligned_matrix_multiply(category, self.getSMatrix())
-        return category_features.to_dense().top_items(n)
+        return [(x[0][1],self.getById(x[0][2]),x[1]) for x in category_features.to_dense().top_items(n)]
 
-    def categoryTopSimilarity(self,category,n=10):
-        sim = self.getSimilarity(post_normalize=False,pre_normalize=True)
-        return sim.left_category(category).top_items(n)
+    def categoryTopSimilarity(self,category,n=20):
+        sim = self.getSimilarity(pre_normalize=True)
+        return [(self.getById(x[0]),x[1]) for x in sim.left_category(category).top_items(n)]
 
-    def categoryTopPredictions(self,category,n=10):
+    def categoryTopPredictions(self,category,n=20):
         predictions = self.getPredictions()
-        return predictions.left_category(category).top_items(n)
+        return [(x[0][1],self.getById(x[0][2]),x[1]) for x in predictions.left_category(category).top_items(n)]
 
     # Use Matrix - projections
-    def project_prediction(self,id1,id2,thresh=.03):
+    def project_prediction(self,id1,id2,thresh=.01):
         predictions = self.getPredictions()
         profile1 = self.getById(id1)
         profile2 = self.getById(id2)
@@ -330,7 +353,7 @@ class DivisiFB:
         return projected_likes
 
     def project_brute(self,id1,id2,thresh=.5):
-        sim = self.getSimilarity(post_normalize=False,pre_normalize=True)
+        sim = self.getSimilarity(pre_normalize=True)
         profile1 = self.getById(id1)
         profile2 = self.getById(id2)
         projected_likes = []
@@ -340,3 +363,10 @@ class DivisiFB:
                     projected_likes.append(like)
                     break
         return projected_likes
+
+    # Creating new profile
+    def createProfile(self,name,data,likeids):
+        self.fbgraph.setName(name)
+        profile = self.fbgraph.createProfile(data,likeids)
+        self.fbgraph.save()
+        return profile
